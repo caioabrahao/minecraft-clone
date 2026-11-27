@@ -23,3 +23,10 @@ so far:
 - VBO is vertex buffer object that stores everything about every vertex
 - VAO vertex array object which stores what is being used and maps each vertex association
 - EBO element buffer object which stores the index of each vertex so you can render multiple triangles without rendering multiple vertices
+
+## Day 2
+
+i went from having a 2d triangle into a 3d rgb cube and a moving camera! crazyy stuff fr.
+
+so.. im gonna watch a 3blue1brown video to understand more about the trigonometry of it all, cuz most of it is still a black box to me. but basically i now have a camera, a 3d shape (same as the 2d, but now using the z coordinate), the shaders updated to use uniforms, window class has now an input watching service. not gonna pretend i know it all, gonna learn and write later.
+

@@ -3,10 +3,13 @@ package br.com.caioabrahao.voxelengine;
 import org.lwjgl.glfw.Callbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_DISABLED;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_CORE_PROFILE;
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_PROFILE;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
@@ -14,11 +17,14 @@ import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwGetKey;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
@@ -38,6 +44,10 @@ public class Window implements  AutoCloseable{
     private int width;
     private int height;
     private final String title;
+
+    private double mouseDx, mouseDy;
+    private double lastX, lastY;
+    private boolean firstMouse = true;
 
     public Window(int width, int height, String title) {
         this.width = width;
@@ -80,6 +90,19 @@ public class Window implements  AutoCloseable{
             glViewport(0, 0, w, h);
         });
 
+        glfwSetCursorPosCallback(handle, (win, x, y) -> {
+            if (firstMouse) {
+                lastX = x;
+                lastY = y;
+                firstMouse = false;
+            }
+            mouseDx += x - lastX;
+            mouseDy += y - lastY;
+            lastX = x;
+            lastY = y;
+        });
+        glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // hide and capture the mouse
+
         glfwMakeContextCurrent(handle);
         GL.createCapabilities();   // required, or every GL call fails
         glfwSwapInterval(1);       // vsync
@@ -100,6 +123,22 @@ public class Window implements  AutoCloseable{
 
     public int getWidth()  { return width; }
     public int getHeight() { return height; }
+
+    public boolean isKeyDown(int key) {
+        return glfwGetKey(handle, key) == GLFW_PRESS;
+    }
+
+    public double consumeMouseDx() {
+        double d = mouseDx;
+        mouseDx = 0;
+        return d;
+    }
+
+    public double consumeMouseDy() {
+        double d = mouseDy;
+        mouseDy = 0;
+        return d;
+    }
 
     @Override
     public void close() {

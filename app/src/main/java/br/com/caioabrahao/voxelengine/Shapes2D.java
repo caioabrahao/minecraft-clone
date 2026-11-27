@@ -7,10 +7,10 @@ public class Shapes2D {
         
         return new Mesh(
             new float[]{
-                -hw, -hh, 0f,
-                 hw, -hh, 0f,
-                 hw,  hh, 0f,
-                -hw,  hh, 0f
+                -hw, 0f, -hh,
+                 hw, 0f, -hh,
+                 hw, 0f,  hh,
+                -hw, 0f,  hh
             },
             new int[] {0, 1, 2,  2, 3, 0}
         );
@@ -27,6 +27,22 @@ public class Shapes2D {
                  hw,  hh, 0f
             },
             new int[] {0, 1, 2}
+        );
+    }
+
+
+    public Mesh plane(float width, float length) {
+        float hw = width / 2f;
+        float hh = length / 2f;
+        
+        return new Mesh(
+            new float[]{
+                -hw, -hh, 0f,
+                 hw, -hh, 0f,
+                 hw,  hh, 0f,
+                -hw,  hh, 0f
+            },
+            new int[] {0, 1, 2,  2, 3, 0}
         );
     }
 }
