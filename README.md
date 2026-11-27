@@ -1,4 +1,6 @@
-# imma make a minecraft clone myself with no ai
+# imma make a minecraft clone myself with no* ai
+
+*im not vibe-coding, but im using AI to learn how opengl and graphics programming works. learn more about my personal AI usage policy at: _didnt do it yet_
 
 ## Development
 
