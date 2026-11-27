@@ -3,33 +3,40 @@ package br.com.caioabrahao.voxelengine;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Matrix4f;
+
 public class Scene implements AutoCloseable {
 
-    private final List<Mesh> meshes = new ArrayList<>();
+    public record SceneObject(Mesh mesh, Matrix4f model) {}
+    private final List<SceneObject> sceneObjects = new ArrayList<>();
 
     public Mesh add(Mesh mesh){
-        meshes.add(mesh);
+        sceneObjects.add(new SceneObject(mesh, new Matrix4f()));
         return mesh;
     }
 
-    public void remove(Mesh mesh){
-        if (meshes.remove(mesh)){
-            mesh.close();
-        }
+    // public void remove(Mesh mesh){
+    //     if (sceneObjects.remove(mesh)){
+    //         mesh.close();
+    //     }
+    // }
+    public Matrix4f referenceModel(int objectIndex) {
+        return sceneObjects.get(objectIndex).model();
     }
 
-    public void render(){
-        for (Mesh mesh : meshes){
-            mesh.render();
+    public void render(Shader shader){
+        for (SceneObject obj : sceneObjects){
+            shader.setUniform("uModel", obj.model());
+            obj.mesh.render();
         }
     }
 
     @Override 
     public void close(){
-        for (Mesh mesh : meshes) {
-            mesh.close();
+        for (SceneObject obj : sceneObjects) {
+            obj.mesh.close();
         }
-        meshes.clear();
+        sceneObjects.clear();
     }
 
 }

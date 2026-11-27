@@ -23,7 +23,6 @@ public class Mesh implements AutoCloseable {
     private final int vbo;
     private final int ebo;
     private final int indexCount;
-    
 
     public Mesh(float[] positions, int[] indices) {
         indexCount = indices.length;
@@ -42,8 +41,11 @@ public class Mesh implements AutoCloseable {
 
         // attribute 0 (matches location = 0 in the shader): 3 floats per vertex,
         // not normalized, 12 bytes between vertices, starting at byte 0
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * Float.BYTES, 0);
+        int stride = 5 * Float.BYTES;
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0);
         glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, stride, 3 * Float.BYTES);
+        glEnableVertexAttribArray(1);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);

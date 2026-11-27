@@ -1,14 +1,21 @@
 package br.com.caioabrahao.voxelengine;
 
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.*;
-
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glEnable;
 
 public class Game {
 
@@ -16,11 +23,13 @@ public class Game {
 
     private final Window window;
     private Shader shader;
-    private Scene scene = new Scene();
+    private final Scene scene = new Scene();
 
     private final Camera camera = new Camera();
     private final Matrix4f projection = new Matrix4f();
     private final Matrix4f model = new Matrix4f();
+
+    private Texture texture;
 
 
     public Game(Window window) {
@@ -53,21 +62,23 @@ public class Game {
         cleanup();
     }
 
-
-
     private void init() {
         glClearColor(0.4f, 0.6f, 0.9f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         
         shader = new Shader("/shaders/basic.vert", "/shaders/basic.frag");
+        texture = new Texture("/textures/atlas.png");
 
         scene.add(new Shapes3D().cube(1f));
+        scene.add(new Shapes3D().cube(0.5f));
         scene.add(new Shapes2D().plane(2f, 2f));
         // Shapes2D shapes2d = new Shapes2D();
 
         // scene.add(
         //     shapes2d.rectangle(0.5f, 0.5f)
         // );
+        scene.referenceModel(0).identity().translate(new Vector3f(0, 0, 5));
+            
         
     }
 
@@ -90,7 +101,7 @@ public class Game {
 
         if(window.isKeyDown(GLFW_KEY_R)) {
             cubeAngle += 0.5f;
-            model.identity().rotate((float) Math.toRadians(cubeAngle), new Vector3f(0, 1, 0));
+            scene.referenceModel(1).identity().rotate((float) Math.toRadians(cubeAngle), new Vector3f(1, 1, 1).normalize());
         }
     }
 
@@ -101,21 +112,23 @@ public class Game {
         shader.bind();
 
         projection.identity().perspective(
-            (float) Math.toRadians(70.0),
+            (float) Math.toRadians(70),
             (float) window.getWidth() / window.getHeight(),
             0.1f, 1000f
         );
 
         shader.setUniform("uProjection", projection);
         shader.setUniform("uView", camera.getViewMatrix());
-        shader.setUniform("uModel", model);   // identity for now
+        texture.bind();
+        shader.setUniform("uTexture", 0);
 
-        scene.render();
+        scene.render(shader);
     }
 
     private void cleanup() {
         // triangle.close();
         scene.close();
         shader.close();
+        texture.close();
     }
 }
